@@ -26,9 +26,9 @@ type tokenStoreItem struct {
 	ID        int64  `gorm:"primary_key;auto_increment"`
 	ExpiredAt int64  `gorm:"index;not null"`
 	Code      string `gorm:"index;size:255;not null"`
-	Access    string `gorm:"index;size:1024;not null"`
+	Access    string `gorm:"index;size:4096;not null"`
 	Refresh   string `gorm:"index;size:1024;not null"`
-	Data      string `gorm:"size:4096"`
+	Data      string `gorm:"size:-1"`
 }
 
 // NewTokenStore creates token store instance
