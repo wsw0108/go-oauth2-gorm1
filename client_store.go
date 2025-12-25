@@ -1,11 +1,12 @@
 package oauth2gorm
 
 import (
+	"context"
 	"encoding/json"
 
+	"github.com/go-oauth2/oauth2/v4"
+	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/jinzhu/gorm"
-	"gopkg.in/oauth2.v3"
-	"gopkg.in/oauth2.v3/models"
 )
 
 type ClientStore struct {
@@ -14,6 +15,8 @@ type ClientStore struct {
 	tableName         string
 	initTableDisabled bool
 }
+
+var _ oauth2.ClientStore = (*ClientStore)(nil)
 
 type clientStoreItem struct {
 	ID     string `gorm:"primary_key;size:255"`
@@ -52,7 +55,7 @@ func (s *ClientStore) toClientInfo(data string) (oauth2.ClientInfo, error) {
 }
 
 // GetByID retrieves and returns client information by id
-func (s *ClientStore) GetByID(id string) (oauth2.ClientInfo, error) {
+func (s *ClientStore) GetByID(ctx context.Context, id string) (oauth2.ClientInfo, error) {
 	if id == "" {
 		return nil, nil
 	}

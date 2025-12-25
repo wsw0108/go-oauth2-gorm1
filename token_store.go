@@ -1,14 +1,15 @@
 package oauth2gorm
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/go-oauth2/oauth2/v4"
+	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/jinzhu/gorm"
-	"gopkg.in/oauth2.v3"
-	"gopkg.in/oauth2.v3/models"
 )
 
 type TokenStore struct {
@@ -21,6 +22,8 @@ type TokenStore struct {
 
 	ticker *time.Ticker
 }
+
+var _ oauth2.TokenStore = (*TokenStore)(nil)
 
 type tokenStoreItem struct {
 	ID        int64  `gorm:"primary_key;auto_increment"`
@@ -94,7 +97,7 @@ func (s *TokenStore) clean() {
 }
 
 // Create create and store the new token information
-func (s *TokenStore) Create(info oauth2.TokenInfo) error {
+func (s *TokenStore) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	data, err := json.Marshal(info)
 	if err != nil {
 		return err
@@ -131,17 +134,17 @@ func (s *TokenStore) removeBy(key string, value string) error {
 }
 
 // RemoveByCode delete the authorization code
-func (s *TokenStore) RemoveByCode(code string) error {
+func (s *TokenStore) RemoveByCode(ctx context.Context, code string) error {
 	return s.removeBy("code", code)
 }
 
 // RemoveByAccess use the access token to delete the token information
-func (s *TokenStore) RemoveByAccess(access string) error {
+func (s *TokenStore) RemoveByAccess(ctx context.Context, access string) error {
 	return s.removeBy("access", access)
 }
 
 // RemoveByRefresh use the refresh token to delete the token information
-func (s *TokenStore) RemoveByRefresh(refresh string) error {
+func (s *TokenStore) RemoveByRefresh(ctx context.Context, refresh string) error {
 	return s.removeBy("refresh", refresh)
 }
 
@@ -174,16 +177,16 @@ func (s *TokenStore) getBy(key string, value string) (oauth2.TokenInfo, error) {
 }
 
 // GetByCode use the authorization code for token information data
-func (s *TokenStore) GetByCode(code string) (oauth2.TokenInfo, error) {
+func (s *TokenStore) GetByCode(ctx context.Context, code string) (oauth2.TokenInfo, error) {
 	return s.getBy("code", code)
 }
 
 // GetByAccess use the access token for token information data
-func (s *TokenStore) GetByAccess(access string) (oauth2.TokenInfo, error) {
+func (s *TokenStore) GetByAccess(ctx context.Context, access string) (oauth2.TokenInfo, error) {
 	return s.getBy("access", access)
 }
 
 // GetByRefresh use the refresh token for token information data
-func (s *TokenStore) GetByRefresh(refresh string) (oauth2.TokenInfo, error) {
+func (s *TokenStore) GetByRefresh(ctx context.Context, refresh string) (oauth2.TokenInfo, error) {
 	return s.getBy("refresh", refresh)
 }
